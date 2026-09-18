@@ -6,25 +6,29 @@ Goal: publish `pi-comprehensive-planning` to npm so anyone can
 - [x] 1. Clean the 20 bundled skills for public use (remove author-specific and host-specific text)
 - [x] 2. Scaffold the package (`package.json` with `pi.skills`, README, LICENSE, .gitignore)
 - [x] 3. Verify the package loads — `pi -e . --no-skills` → exactly 20 skills
-- [ ] 4. Write the extension half
+- [x] 4. Write the extension half
 - [ ] 5. Publish to npm, then `pi install npm:pi-comprehensive-planning`
 - [ ] 6. Push to GitHub, tag the release
+- [ ] 7. Swap the local-path install in `~/.pi/agent/settings.json` for the npm one after publishing
 
-## Next: the extension
+## Next: publish
 
-Command name is decided: **`/plan-comprehensively`**.
+```bash
+cd /Users/rizquuula/Playground/pi/pi-comprehensive-planning
+git remote add origin git@github.com:rizquuula/pi-comprehensive-planning.git
+git push -u origin main
+npm publish
+```
 
-Planned surface:
+`pi-comprehensive-planning` was free on npm when this was checked (2026-09-18).
+`pi-plan`, `pi-planning`, and `pi-todo` are taken by other people.
 
-| Piece | What it does |
-|---|---|
-| `/plan-comprehensively <task>` | Deterministic trigger. Loads the skill, starts the workflow, no waiting for the model to decide |
-| `plan_validate` tool | Mechanical checks on a written plan: measurable §1a criteria, §6 tree with `[NEW]`/`[EDIT]` tags, §7 ASCII diagram present, §8 cycles each naming a failing test, §9 one owner per file |
-| todo widget | Derived from PLAN.md §8 cycles + §9 slices, so plan and todos cannot drift |
-| `tool_call` hook | Warn (never block) when `edit`/`write` starts on a multi-file change with no PLAN.md |
+After publishing, replace the local path in `~/.pi/agent/settings.json`:
 
-Keep it zero-dependency. `@earendil-works/pi-coding-agent`, `typebox`, and `@earendil-works/pi-tui`
-go in `peerDependencies` with `"*"` and must not be bundled.
+```bash
+pi remove /Users/rizquuula/Playground/pi/pi-comprehensive-planning
+pi install npm:pi-comprehensive-planning
+```
 
 ## Verified facts (don't re-derive)
 
@@ -44,3 +48,14 @@ go in `peerDependencies` with `"*"` and must not be bundled.
   Worth an upstream issue; README documents only the verified pattern.
 - Model self-reporting of its own skill list is unreliable. Twice it listed skills that were not
   loaded. Verify with `ctx.getSystemPrompt()` from a throwaway extension, not by asking the model.
+- `--print` **dispatches extension commands** (verified), but silently drops any turn the handler
+  injects with `sendUserMessage`. Test commands through the SDK instead: `session.prompt(cmd)`
+  resolves as soon as the command dispatch finishes, so wait for the agent to go idle before
+  checking the result.
+- The SDK needs both `cwd` and `agentDir` on `DefaultResourceLoader`, or it throws on `resolvePath`.
+  Pass `skillsOverride: () => ({ skills: [], diagnostics: [] })` to isolate from global skills.
+- End-to-end proof of `/plan-comprehensively` (2026-09-18): injected the skill, the model wrote a
+  13-section PLAN.md, called `plan_validate`, edited, and re-validated. Result: 0 errors, 1 warning
+  ("Goal runs long"), and `planTodos` extracted 4 cycles for the widget.
+- Not verified end-to-end: the 3-file nudge. It only fires when `ctx.hasUI` is true, so a headless
+  run cannot observe it. Logic is 8 lines and guarded; test it interactively once.
