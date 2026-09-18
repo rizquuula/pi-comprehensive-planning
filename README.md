@@ -11,14 +11,49 @@ go, or change something.
 pi install npm:pi-comprehensive-planning
 ```
 
-Then just describe what you want. The skill triggers on "plan this", "design this", "break this down",
-or automatically when the work spans 3+ files, a new module, an external integration, a schema
-migration, or an architectural change. Say "just do it" to skip it.
+Then just describe what you want, or run the command:
+
+```
+/plan-comprehensively add a GET /health endpoint that reports database connectivity
+```
+
+The skill triggers on "plan this", "design this", "break this down", or automatically when the work
+spans 3+ files, a new module, an external integration, a schema migration, or an architectural
+change. Say "just do it" to skip it. The command is the deterministic version of the same thing — it
+does not wait for the model to decide a plan is warranted.
+
+## The extension
+
+The skills carry the judgement. The extension adds the three things prose cannot.
+
+**`/plan-comprehensively <task>`** — loads the skill, tells the model to write `PLAN.md` section by
+section, and names the session after the task. If you run it with no argument, it asks what to plan.
+
+**`plan_validate`** — a tool the model calls on the written plan. It checks the mechanical rules:
+are the success criteria measurable and tied to a test or metric, does the file tree carry
+`[NEW]`/`[EDIT]`/`[DELETE]`/`[MOVE]` tags, is there a real ASCII diagram, does every cycle name a
+failing test and a done-criterion, does any file get claimed by two slices, is every validation
+category filled or explicitly `SKIPPED`. Errors and warnings are reported separately.
+
+```
+PLAN.md: 2 error(s), 1 warning(s).
+
+ERROR §8    Cycle 1: the Red column is empty. Name the failing test first.
+ERROR §9    src/auth/token.ts is claimed by 2 slices (A, B). One file, one owner.
+warn  §8    Only 2 cycle(s). Anything non-trivial usually needs 3–10.
+```
+
+**A todo list that cannot drift** — the §8 cycles are already an ordered checklist, so the extension
+renders them under the editor instead of keeping a second copy of the truth. Edit the plan and the
+todos change with it.
+
+**One nudge, once** — if three or more files get edited in a session with no `PLAN.md` anywhere, pi
+says so. It never blocks anything, and it stays quiet after that.
 
 ## What's inside
 
-Twenty skills. One of them writes plans; the rest are the standards the plan has to comply with, so
-the design starts correct instead of getting corrected in review.
+Twenty skills and one extension. One skill writes plans; the rest are the standards the plan has to
+comply with, so the design starts correct instead of getting corrected in review.
 
 **Planning**
 
@@ -72,18 +107,29 @@ any remaining skill on or off interactively — that is the reliable way to drop
 
 ## Roadmap
 
-Planned for the extension half of this package:
+- A `plan_validate` summary rendered as a diff against the previous validation, so you can see what
+a revision fixed
+- Deriving §11 from §8 instead of asking for it twice
+- A `--report` flag on `/plan-comprehensively` that writes the plan to a path of your choosing
 
-- `/plan-comprehensively` — deterministic trigger instead of waiting for the model to decide
-- `plan_validate` — mechanical check of a written plan (are the success criteria measurable, does the
-  file tree carry `[NEW]`/`[EDIT]` tags, does every cycle have a failing test named)
-- A todo list derived from the plan's own cycles, so the plan and the todos cannot drift apart
+## Development
+
+There is no build step. pi loads the TypeScript directly, so a clone runs as-is:
+
+```bash
+pi -e ./ --no-skills          # load this package in isolation
+npm test                      # node --test, no dependencies installed
+```
+
+The tests cover the validator only — the part with rules worth pinning down. `tests/plan-file.test.ts`
+builds one plan that must produce zero findings, then breaks it eleven different ways.
 
 ## Security
 
-Skills are instructions to a model, and a model with tools can run anything. Read the files before
-you install this, or anything else. There is no executable code in this package yet; when the
-extension lands it will run with your full user permissions, and this section will say so plainly.
+Skills are instructions to a model, and a model with tools can run anything. The extension here reads
+and writes files, registers one tool, one command, and two event handlers. It runs no subprocesses,
+opens no sockets, and makes no network calls of its own. Read the source before you install it — it is
+about 450 lines.
 
 ## Provenance
 

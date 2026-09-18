@@ -1,18 +1,20 @@
 {
   "name": "pi-comprehensive-planning",
-  "version": "0.1.0",
-  "description": "Reviewable implementation plans for the pi coding agent. Ships the comprehensive-planning skill plus the language and cross-cutting standards it routes to.",
+  "version": "0.2.0",
+  "description": "Reviewable implementation plans for the pi coding agent: the comprehensive-planning skill, the standards it routes to, and an extension that triggers, validates, and tracks the plan.",
   "keywords": [
     "pi-package",
     "pi",
     "planning",
     "plan",
     "skills",
+    "extension",
     "code-review",
     "standards"
   ],
   "license": "MIT",
   "author": "Rizquuula",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rizquuula/pi-comprehensive-planning.git"
@@ -22,11 +24,22 @@
     "url": "https://github.com/rizquuula/pi-comprehensive-planning/issues"
   },
   "pi": {
+    "extensions": [
+      "./extensions"
+    ],
     "skills": [
       "./skills"
     ]
   },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "scripts": {
+    "test": "node --test tests/plan-file.test.ts"
+  },
   "files": [
+    "extensions",
     "skills",
     "README.md",
     "LICENSE"
