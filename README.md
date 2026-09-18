@@ -8,7 +8,7 @@ diagram, test-first cycles, and the risks it is accepting. You read it in under 
 go, or change something.
 
 ```bash
-pi install npm:pi-comprehensive-planning
+pi install git:github.com/rizquuula/pi-comprehensive-planning
 ```
 
 Then just describe what you want, or run the command:
@@ -21,6 +21,38 @@ The skill triggers on "plan this", "design this", "break this down", or automati
 spans 3+ files, a new module, an external integration, a schema migration, or an architectural
 change. Say "just do it" to skip it. The command is the deterministic version of the same thing — it
 does not wait for the model to decide a plan is warranted.
+
+## Install
+
+```bash
+# from GitHub (works today)
+pi install git:github.com/rizquuula/pi-comprehensive-planning
+
+# from npm, once it is published
+pi install npm:pi-comprehensive-planning
+
+# try it without installing anything
+pi -e git:github.com/rizquuula/pi-comprehensive-planning
+```
+
+Add `-l` to install into the current project instead of globally, so your team gets it from
+`.pi/settings.json`:
+
+```bash
+pi install -l git:github.com/rizquuula/pi-comprehensive-planning
+```
+
+To pin a version, append a tag or commit: `...@v0.2.0`. Unpinned installs follow the default branch
+and update with `pi update --extensions`.
+
+Check what you got, and remove it again:
+
+```bash
+pi list
+pi uninstall git:github.com/rizquuula/pi-comprehensive-planning
+```
+
+Requires pi v0.85 or newer. There is nothing to compile — pi loads the TypeScript directly.
 
 ## The extension
 
