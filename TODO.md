@@ -7,28 +7,22 @@ Goal: publish `pi-comprehensive-planning` to npm so anyone can
 - [x] 2. Scaffold the package (`package.json` with `pi.skills`, README, LICENSE, .gitignore)
 - [x] 3. Verify the package loads — `pi -e . --no-skills` → exactly 20 skills
 - [x] 4. Write the extension half
-- [ ] 5. Publish to npm, then `pi install npm:pi-comprehensive-planning`
-- [ ] 6. Push to GitHub, tag the release
-- [ ] 7. Swap the local-path install in `~/.pi/agent/settings.json` for the npm one after publishing
+- [x] 5. Push to GitHub (public), tag `v0.2.0`
+- [x] 6. Install from the GitHub URL and verify
+- [ ] 7. Publish to npm — blocked on `npm login` (not authenticated as of 2026-09-18)
 
-## Next: publish
+## Publish to npm (remaining)
 
 ```bash
+npm login                     # interactive, needs the user's credentials + OTP
 cd /Users/rizquuula/Playground/pi/pi-comprehensive-planning
-git remote add origin git@github.com:rizquuula/pi-comprehensive-planning.git
-git push -u origin main
-npm publish
+npm publish --access public
 ```
 
-`pi-comprehensive-planning` was free on npm when this was checked (2026-09-18).
+The name `pi-comprehensive-planning` was free on npm when checked (2026-09-18).
 `pi-plan`, `pi-planning`, and `pi-todo` are taken by other people.
 
-After publishing, replace the local path in `~/.pi/agent/settings.json`:
-
-```bash
-pi remove /Users/rizquuula/Playground/pi/pi-comprehensive-planning
-pi install npm:pi-comprehensive-planning
-```
+After publishing, the install line in the README already covers npm — no edit needed.
 
 ## Verified facts (don't re-derive)
 
@@ -59,3 +53,12 @@ pi install npm:pi-comprehensive-planning
   ("Goal runs long"), and `planTodos` extracted 4 cycles for the widget.
 - Not verified end-to-end: the 3-file nudge. It only fires when `ctx.hasUI` is true, so a headless
   run cannot observe it. Logic is 8 lines and guarded; test it interactively once.
+- A local-path install and a git install of the same package **conflict**: pi sees them as different
+  identities, loads both, and refuses the duplicate `plan_validate` tool with a hint to use `pi -ne`.
+  Uninstall one before installing the other.
+- A git install runs a plain `npm install` in the clone, which auto-installs `peerDependencies`.
+  With `"*"` ranges that pulled the whole pi tree (166 packages) into a 450-line extension's
+  `node_modules`. `peerDependenciesMeta: { optional: true }` fixes it — now it pulls nothing.
+  npm also writes a `package-lock.json` into the clone, hence the .gitignore entry.
+- `pi -e <source> --no-skills -ne` is the way to test a package in isolation. `-ne` is needed when the
+  same package is already installed globally, or the duplicate tool registration aborts the run.
