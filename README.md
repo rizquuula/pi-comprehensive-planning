@@ -25,14 +25,14 @@ does not wait for the model to decide a plan is warranted.
 ## Install
 
 ```bash
-# from GitHub (works today)
-pi install git:github.com/rizquuula/pi-comprehensive-planning
-
-# from npm, once it is published
+# from npm
 pi install npm:pi-comprehensive-planning
 
+# from GitHub
+pi install git:github.com/rizquuula/pi-comprehensive-planning
+
 # try it without installing anything
-pi -e git:github.com/rizquuula/pi-comprehensive-planning
+pi -e npm:pi-comprehensive-planning
 ```
 
 Add `-l` to install into the current project instead of globally, so your team gets it from
@@ -42,14 +42,14 @@ Add `-l` to install into the current project instead of globally, so your team g
 pi install -l git:github.com/rizquuula/pi-comprehensive-planning
 ```
 
-To pin a version, append a tag or commit: `...@v0.2.0`. Unpinned installs follow the default branch
-and update with `pi update --extensions`.
+To pin a version, append a tag or commit: `@0.2.1` for npm, `@v0.2.1` for git. Unpinned installs
+follow the latest release and update with `pi update --extensions`.
 
 Check what you got, and remove it again:
 
 ```bash
 pi list
-pi uninstall git:github.com/rizquuula/pi-comprehensive-planning
+pi uninstall npm:pi-comprehensive-planning
 ```
 
 Requires pi v0.85 or newer. There is nothing to compile — pi loads the TypeScript directly.

@@ -9,20 +9,22 @@ Goal: publish `pi-comprehensive-planning` to npm so anyone can
 - [x] 4. Write the extension half
 - [x] 5. Push to GitHub (public), tag `v0.2.0`
 - [x] 6. Install from the GitHub URL and verify
-- [ ] 7. Publish to npm — blocked on `npm login` (not authenticated as of 2026-09-18)
+- [x] 7. Publish to npm — live at https://www.npmjs.com/package/pi-comprehensive-planning
 
-## Publish to npm (remaining)
+## Releasing a new version
 
 ```bash
-npm login                     # interactive, needs the user's credentials + OTP
-cd /Users/rizquuula/Playground/pi/pi-comprehensive-planning
-npm publish --access public
+npm version patch            # or minor / major
+git push --follow-tags
+npm publish
 ```
 
-The name `pi-comprehensive-planning` was free on npm when checked (2026-09-18).
-`pi-plan`, `pi-planning`, and `pi-todo` are taken by other people.
+Publishing needs a granular access token with **Bypass 2FA** enabled, Permissions
+**Read and write**, and Packages **All packages**. A token without bypass-2FA authenticates fine
+(`npm whoami` succeeds) but every `npm publish` fails with a 403 about 2FA — that combination is the
+tell. Keep the token in `~/.npmrc`; do not commit it.
 
-After publishing, the install line in the README already covers npm — no edit needed.
+`pi-plan`, `pi-planning`, and `pi-todo` are taken by other people on npm. This name was free.
 
 ## Verified facts (don't re-derive)
 
